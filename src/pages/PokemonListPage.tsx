@@ -58,6 +58,7 @@ function PokemonListPage() {
   const pokemonList: PokemonListResult[] = selectedType
     ? (typeData?.pokemon.map((entry) => entry.pokemon) ?? [])
     : (infiniteData?.pages.flatMap((page) => page.results) ?? []);
+    
 
   return (
     <div className="min-h-screen bg-gray-50">

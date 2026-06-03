@@ -75,9 +75,8 @@ function PokemonDetailPage() {
                 </h1>
               </div>
 
-              
               <div className="flex gap-2" data-testid="pokemon-types">
-                {pokemon.types.map(({ type }: PokemonType) => (
+                {(pokemon.types ?? []).map(({ type }: PokemonType) => (
                   <TypeBadge key={type.name} type={type.name} />
                 ))}
               </div>
@@ -110,7 +109,7 @@ function PokemonDetailPage() {
                   Abilities
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {pokemon.abilities.map(({ ability, is_hidden }: PokemonAbility) => (
+                  {(pokemon.abilities ?? []).map(({ ability, is_hidden }: PokemonAbility) => (
                     <span
                       key={ability.name}
                       className={`rounded-full px-3 py-0.5 text-xs font-medium capitalize ${
@@ -136,7 +135,7 @@ function PokemonDetailPage() {
               Base Stats
             </h2>
             <div className="flex flex-col gap-3">
-              {pokemon.stats.map(({ stat, base_stat }: PokemonStat) => (
+              {(pokemon.stats ?? []).map(({ stat, base_stat }: PokemonStat) => (
                 <div key={stat.name} className="flex items-center gap-3">
                   <span className="w-24 text-right text-xs font-medium text-gray-500">
                     {formatStatName(stat.name)}

@@ -1,5 +1,8 @@
 import type {
   PokemonListPage,
+  PokemonDetail,
+  TypeList,
+  TypeDetail,
 } from './types';
 
 const BASE_URL = 'https://pokeapi.co/api/v2';
@@ -22,3 +25,14 @@ export async function getPokemonPage(
   );
 }
 
+export async function getPokemonDetail(name: string): Promise<PokemonDetail> {
+  return fetchJson<PokemonDetail>(`${BASE_URL}/pokemon/${name}`);
+}
+
+export async function getPokemonTypes(): Promise<TypeList> {
+  return fetchJson<TypeList>(`${BASE_URL}/type?limit=100`);
+}
+
+export async function getPokemonsByType(type: string): Promise<TypeDetail> {
+  return fetchJson<TypeDetail>(`${BASE_URL}/type/${type}`);
+}

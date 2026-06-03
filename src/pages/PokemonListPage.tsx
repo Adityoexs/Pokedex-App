@@ -1,15 +1,22 @@
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useSearchParams } from 'react-router-dom';
 import { usePokemonInfiniteList } from '../features/hooks/usePokemonInfiniteList';
+import { usePokemonsByType } from '../features/hooks/usePokemonsByType';
 import type { PokemonListResult } from '../api/types';
 import PokemonCard from '../features/components/PokemonCard';
+import TypeFilter from '../features/components/TypeFilter';
 import LoadingSpinner from '../features/components/LoadingSpinner';
 import ErrorState from '../features/components/ErrorState';
 
 function PokemonListPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedType = searchParams.get('type');
+  
 
   const { ref: loadMoreRef, inView } = useInView({ threshold: 0 });
 
+  
   const {
     data: infiniteData,
     isLoading: infiniteLoading,
@@ -19,18 +26,38 @@ function PokemonListPage() {
     isFetchingNextPage,
     refetch: refetchInfinite,
   } = usePokemonInfiniteList();
+
+  
+  const {
+    data: typeData,
+    isLoading: typeLoading,
+    isError: typeError,
+    refetch: refetchType,
+  } = usePokemonsByType(selectedType);
+
   
   useEffect(() => {
-    if (inView && hasNextPage) {
+    if (inView && hasNextPage && !selectedType) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, selectedType, fetchNextPage]);
 
-  const isLoading = infiniteLoading;
-  const isError = infiniteError;
-  const onRetry = refetchInfinite;
+  const handleTypeChange = (type: string | null) => {
+    if (type) {
+      setSearchParams({ type });
+    } else {
+      setSearchParams({});
+    }
+  };
 
-  const pokemonList: PokemonListResult[] = infiniteData?.pages.flatMap((page) => page.results) || [];
+  const isLoading = selectedType ? typeLoading : infiniteLoading;
+  const isError = selectedType ? typeError : infiniteError;
+  const onRetry = selectedType ? refetchType : refetchInfinite;
+
+  
+  const pokemonList: PokemonListResult[] = selectedType
+    ? (typeData?.pokemon.map((entry) => entry.pokemon) ?? [])
+    : (infiniteData?.pages.flatMap((page) => page.results) ?? []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -39,8 +66,12 @@ function PokemonListPage() {
         <div className="mx-auto max-w-6xl px-4 py-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-2xl font-bold text-gray-900">
-              🎮 Pokedex
+              🎮 Pokédex
             </h1>
+            <TypeFilter
+              selectedType={selectedType}
+              onTypeChange={handleTypeChange}
+            />
           </div>
         </div>
       </header>
@@ -71,6 +102,8 @@ function PokemonListPage() {
           ))}
         </div>
 
+        
+        {!selectedType && (
           <div ref={loadMoreRef} className="mt-8 flex justify-center">
             {isFetchingNextPage && (
               <LoadingSpinner message="Loading more Pokémon..." />
@@ -81,6 +114,7 @@ function PokemonListPage() {
               </p>
             )}
           </div>
+        )}
       </main>
     </div>
   );

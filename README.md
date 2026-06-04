@@ -64,10 +64,6 @@ Use the **Clear** button to return to the full unfiltered list.
 
 ## Deployment
 
-Add your deployed app link here if available.
-
-Example:
-
 ```text
 https://pokedex-app-gold.vercel.app/
 ```
